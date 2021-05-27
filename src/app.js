@@ -14,7 +14,7 @@ App = {
     if (typeof web3 !== 'undefined') {
       App.web3Provider = web3.currentProvider
       web3 = new Web3(web3.currentProvider)
-      window.alert("Please asdconnect to Metamask.")
+//      window.alert("Please asdconnect to Metamask.")
     } else {
       window.alert("Please connect to Metamask.")
     }
@@ -93,35 +93,72 @@ App = {
     $("#numberOfEndorsees").text(getNumOfEndorsees);
     },
 
+//add confirm and reject errors.
     addUser: async () => {
+    try {
          var funcUserAddress = $("#funcUserAddress").val();
          var funcUserRole = $("#funcUserRole").val();
          var funcUserNotes = $("#funcUserNotes").val();
          await App.rbacSC.addUser(funcUserAddress, funcUserRole, funcUserNotes);
-         window.location.reload()
+         window.location.reload()}
+    catch (error) {
+            if (error.code === 4001) {
+              window.alert("MetaMask Tx Signature: User denied transaction signature.")
+            } else if (error.code === -32603){
+              window.alert("Changes not saved, only the owner of smart contract can add users.")
+            }
+    }
     },
 
     removeUser: async () => {
-        // var remUserAddress = $("#remUserAddress").val();
-        // await App.rbacSC.removeUser(remUserAddress);
-        // window.location.reload()
+        try {
+         var remUserAddress = $("#remUserAddress").val();
+         await App.rbacSC.removeUser(remUserAddress);
+         window.location.reload()
+         window.alert("User removed successfully.")
+       }
+         catch (error) {
+                 if (error.code === 4001) {
+                   window.alert("MetaMask Tx Signature: User denied transaction signature.")
+                 } else if (error.code === -32603){
+                   window.alert("Changes not saved, only the owner can remove a user.")
+                 }
+         }
     },
 
     addEndorsee: async () => {
-        // var funcEndorseeAddress = $("#funcEndorseeAddress").val();
-        // var funcEndorseeNotes = $("#funcEndorseeNotes").val();
-        // await App.rbacSC.addEndorsee(funcEndorseeAddress, funcEndorseeNotes);
-        // window.location.reload()
+        try {
+          var funcEndorseeAddress = $("#funcEndorseeAddress").val();
+          var funcEndorseeNotes = $("#funcEndorseeNotes").val();
+          await App.rbacSC.addEndorsee(funcEndorseeAddress, funcEndorseeNotes);
+          window.location.reload()}
+        catch (error) {
+                if (error.code === 4001) {
+                  window.alert("MetaMask Tx Signature: User denied transaction signature.")
+                } else if (error.code === -32603){
+                  window.alert("Changes not saved, only a user can endorse.")
+                }
+        }
     },
 
     removeEndorsee: async () => {
-        // var remEndorseeAddress = $("#remEndorseeAddress").val();
-        // await App.rbacSC.removeEndorsee(remEndorseeAddress);
-        // window.location.reload()
+        try {
+        var remEndorseeAddress = $("#remEndorseeAddress").val();
+        await App.rbacSC.removeEndorsee(remEndorseeAddress);
+        window.location.reload()
+        window.alert("Endorsee removed successfully.")
+      }
+        catch (error) {
+                if (error.code === 4001) {
+                  window.alert("MetaMask Tx Signature: User denied transaction signature.")
+                } else if (error.code === -32603){
+                  window.alert("Changes not saved, only an endorser can remove its endorsee.")
+                }
+        }
     },
 
     displayUser: async () => {
-
+      try {
          var userCounterBox = parseInt($("#userCounter").val());
          var userAddress = await App.rbacSC.userAccounts(userCounterBox);
          var userDetails = await App.rbacSC.users(userAddress)
@@ -131,65 +168,100 @@ App = {
          $("#userNotes").text(result[1]);
          var myDate = new Date(result[2]*1000);
          $("#userSince").text(myDate.toLocaleString());
+       } catch (error) {
+         if (userCounterBox == 0){
+
+         }else {
+      window.alert("User does not exist")
+         }
+       }
     },
 
     displayUserPlus: async () => {
-        // var userCounterBox = parseInt($("#userCounter").val()) + 1;
-        // var userDetails = await App.rbacSC.users(userCounterBox)
-        // var result = userDetails.toString().split(",");
-        // $("#userAddress").text(result[0]);
-        // $("#userRole").text(result [1]);
-        // $("#userNotes").text(result [2]);
-        // var myDate = new Date(result[3]*1000);
-        // $("#userSince").text(myDate.toLocaleString());
-        // document.getElementById('userCounter').value =  userCounterBox;
+      try {
+        var userCounterBox = parseInt($("#userCounter").val()) + 1;
+        var userAddress = await App.rbacSC.userAccounts(userCounterBox);
+        var userDetails = await App.rbacSC.users(userAddress)
+        var result = userDetails.toString().split(",");
+        $("#userAddress").text(userAddress);
+        $("#userRole").text(result[0]);
+        $("#userNotes").text(result[1]);
+        var myDate = new Date(result[2]*1000);
+        $("#userSince").text(myDate.toLocaleString());
+        document.getElementById('userCounter').value =  userCounterBox;
+      } catch (error) {
+        window.alert("Last user reached.")
+      }
     },
 
     displayUserMinus: async () => {
-        // var userCounterBox = parseInt($("#userCounter").val()) - 1;
-        // var userDetails = await App.rbacSC.users(userCounterBox)
-        // var result = userDetails.toString().split(",");
-        // $("#userAddress").text(result[0]);
-        // $("#userRole").text(result [1]);
-        // $("#userNotes").text(result [2]);
-        // var myDate = new Date(result[3]*1000);
-        // $("#userSince").text(myDate.toLocaleString());
-        // document.getElementById('userCounter').value =  userCounterBox;
+      try {
+        var userCounterBox = parseInt($("#userCounter").val()) - 1;
+        var userAddress = await App.rbacSC.userAccounts(userCounterBox);
+        var userDetails = await App.rbacSC.users(userAddress)
+        var result = userDetails.toString().split(",");
+        $("#userAddress").text(userAddress);
+        $("#userRole").text(result[0]);
+        $("#userNotes").text(result[1]);
+        var myDate = new Date(result[2]*1000);
+        $("#userSince").text(myDate.toLocaleString());
+        document.getElementById('userCounter').value =  userCounterBox;
+      } catch (error) {
+        window.alert("First user reached.")
+      }
     },
 
     displayEndorsee: async () => {
-        // var uendorseeCounterBox = parseInt($("#endorseeCounter").val());
-        // var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
-        // var result = endorseeDetails.toString().split(",");
-        // $("#endorseeAddress").text(result[1]);
-        // $("#endorserAddress").text(result[0]);
-        // $("#endorseeNotes").text(result[2]);
-        // var myDate = new Date(result[3]*1000);
-        // $("#endorseeSince").text(myDate.toLocaleString());
+        try {
+           var endorseeCounterBox = parseInt($("#endorseeCounter").val());
+           var endorseeAddress = await App.rbacSC.endorseeAccounts(endorseeCounterBox)
+           var endorseeDetails = await App.rbacSC.endorsees(endorseeAddress)
+           var result = endorseeDetails.toString().split(",");
+           $("#endorseeAddress").text(endorseeAddress);
+           $("#endorserAddress").text(result[0]);
+           $("#endorseeNotes").text(result[1]);
+           var myDate = new Date(result[2]*1000);
+           $("#endorseeSince").text(myDate.toLocaleString());
+         } catch (error) {
+           if (endorseeCounterBox == 0){
+           }else {
+           window.alert("Endorsee does not exist")
+           }
+         }
     },
 
     displayEndorseePlus: async () => {
-        // var uendorseeCounterBox = parseInt($("#endorseeCounter").val()) + 1;
-        // var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
-        // var result = endorseeDetails.toString().split(",");
-        // $("#endorseeAddress").text(result[1]);
-        // $("#endorserAddress").text(result[0]);
-        // $("#endorseeNotes").text(result[2]);
-        // var myDate = new Date(result[3]*1000);
-        // $("#endorseeSince").text(myDate.toLocaleString());
-        // document.getElementById('endorseeCounter').value =  uendorseeCounterBox;
+        try {
+          var endorseeCounterBox = parseInt($("#endorseeCounter").val()) + 1;
+          var endorseeAddress = await App.rbacSC.endorseeAccounts(endorseeCounterBox)
+          var endorseeDetails = await App.rbacSC.endorsees(endorseeAddress)
+          var result = endorseeDetails.toString().split(",");
+          $("#endorseeAddress").text(endorseeAddress);
+          $("#endorserAddress").text(result[0]);
+          $("#endorseeNotes").text(result[1]);
+          var myDate = new Date(result[2]*1000);
+          $("#endorseeSince").text(myDate.toLocaleString());
+          document.getElementById('endorseeCounter').value =  endorseeCounterBox;
+        } catch (error) {
+          window.alert("Last endorsee reached.")
+        }
     },
 
     displayEndorseeMinus: async () => {
-        // var uendorseeCounterBox = parseInt($("#endorseeCounter").val()) - 1;
-        // var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
-        // var result = endorseeDetails.toString().split(",");
-        // $("#endorseeAddress").text(result[1]);
-        // $("#endorserAddress").text(result[0]);
-        // $("#endorseeNotes").text(result[2]);
-        // var myDate = new Date(result[3]*1000);
-        // $("#endorseeSince").text(myDate.toLocaleString());
-        // document.getElementById('endorseeCounter').value =  uendorseeCounterBox;
+      try {
+        var endorseeCounterBox = parseInt($("#endorseeCounter").val()) - 1;
+        var endorseeAddress = await App.rbacSC.endorseeAccounts(endorseeCounterBox)
+        var endorseeDetails = await App.rbacSC.endorsees(endorseeAddress)
+        var result = endorseeDetails.toString().split(",");
+        $("#endorseeAddress").text(endorseeAddress);
+        $("#endorserAddress").text(result[0]);
+        $("#endorseeNotes").text(result[1]);
+        var myDate = new Date(result[2]*1000);
+        $("#endorseeSince").text(myDate.toLocaleString());
+        document.getElementById('endorseeCounter').value =  endorseeCounterBox;
+      } catch (error) {
+        window.alert("First endorsee reached.")
+      }
     },
   }
 
