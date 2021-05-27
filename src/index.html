@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <title>RBACSC | jpmcruz</title>
+      <link href="vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- The app.css contents will be substituted in below -->
+        <!-- STYLE -->
+        <style>
+          div.maintext {
+            text-indent: 20px;
+          }
+          div.row {
+            text-indent: 35px;
+          }
+          div.main-container {
+            text-indent: 30px;
+          }
+        </style>
+
+      </head>
+
+      <body>
+      <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="https://github.com/jpmcruz/RBAC-SC" target="_blank">RBACSC | jpmcruz</a>
+        <ul class="navbar-nav px-3">
+          <li class="nav-item text-nowrap d-none d-sm-none d-sm-block">
+            <small><a class="nav-link" href="#"><span id="account"></span></a></small>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="maintext">
+        <br></br>
+            <h3 class="text message">Organization Name:&nbsp;<span id="orgName"></span></h3>
+            <p>Owner Address:&nbsp;<strong id="ownerAddress"></strong></p>
+            <p>Role:&nbsp;<strong id="ownerRole"></strong></p>
+            <p>Notes:&nbsp;<strong id="ownerNotes"></strong></p>
+            <p>Creation Date:&nbsp;<strong id="ownerSince"></strong></p>
+<br>
+        <h3>Add/Remove Users (Only by Owner):</h3></div>
+
+      <div class="row">
+          <div class="column">
+            <p> Enter Address:
+            <input id="funcUserAddress" /></p>
+            <p> Enter Role:
+            <input id="funcUserRole" /></p>
+            <p> Enter Notes:
+            <input id="funcUserNotes" /></p>
+            <p><button id="bt_addUser" onclick="App.addUser()">Add User</button></p>
+          </div>
+          <div class="column">
+            <p> Enter Address:
+            <input id="remUserAddress" /></p>
+            <p><button id="bt_removeUser" onclick="App.removeUser()">Remove User</button></p>
+          </div>
+      </div>
+
+<br>
+
+      <div class="maintext"><h3>Add/Remove Endorsees (Only by User):</h3></div>
+      <div class="row">
+            <div class="column">
+              <p> Enter Address:
+              <input id="funcEndorseeAddress" /></p>
+              <p> Enter Notes:
+              <input id="funcEndorseeNotes" /></p>
+              <p><button id="bt_addEndorsee" onclick="App.addEndorsee()">Add Endorsee</button></p>
+            </div>
+            <div class="column">
+              <p> Enter Address:
+              <input id="remEndorseeAddress" /></p>
+              <p><button id="bt_removeEndorsee" onclick="App.removeEndorsee()">Remove Endorsee</button></p>
+            </div>
+      </div>
+
+<br>
+
+      <div class="maintext"><h1>Blockchain Data</h1></div>
+      <div class="row">
+        <div class="column">
+          <br><p>        Number of Users: <strong id="numberOfUsers"></strong></p>
+          <p><input type="number" id="userCounter" value = 1><button id="bt_Plus" onclick="App.displayUserPlus()">+</button><button id="bt_Minus" onclick="App.displayUserMinus()">-</button><button id="bt_displayUser" onclick="App.displayUser()">Find</button></p>
+          <p>     Address: <strong id="userAddress"></strong></p>
+          <p>     Role: <strong id="userRole"></strong></p>
+          <p>     Notes: <strong id="userNotes"></strong></p>
+          <p>     Member Since: <strong id="userSince"></strong></p>
+          <br>
+        </div>
+        <div class="column">
+        <br><p> Number of Endorsees: <strong id="numberOfEndorsees"></strong></p>
+        <p><input type="number" id="endorseeCounter" value = 1><button id="bt_ePlus" onclick="App.displayEndorseePlus()">+</button><button id="bt_eMinus" onclick="App.displayEndorseeMinus()">-</button><button id="bt_displayEndorsee" onclick="App.displayEndorsee()">Find</button></p>
+            <p>     Endorsee Address: <strong id="endorseeAddress"></strong></p>
+            <p>     Endorsed By: <strong id="endorserAddress"></strong></p>
+            <p>     Notes: <strong id="endorseeNotes"></strong></p>
+            <p>     Member Since: <strong id="endorseeSince"></strong></p>
+        <br>
+        </div>
+      </div>
+
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="vendor/truffle-contract/dist/truffle-contract.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
