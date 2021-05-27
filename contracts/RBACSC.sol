@@ -2,133 +2,151 @@ pragma solidity ^0.5.0;
 
 contract RBACSC {
 
+    mapping (address => User) public users;
+    address[] public userAccounts;
+    mapping (address => Endorse) public endorsees;
+    address[] public endorseeAccounts;
+    Owner owner;
+    uint public indexUser;
+    uint public indexEndorsee;
     bool public status;
-    address public owner;
-    string public organizationName;
-    uint public numberOfUsers;
-    uint public numberOfEndorsees;
-    mapping (address => uint) public userId;
-    mapping (address => uint) public endorsedUserId;
-    User[99] public users;
-    Endorse[99] public endorsedUsers;
 
-    event UserAdded(address UserAddress, string UserRole, string UserNotes);
-    event UserUpdated(address UserAddress, string UserRole, string UserNotes);
-    event UserRemoved(address UserAddress);
-    event UserEndorsed(address Endorser, address Endorsee);
-    event EndorseeRemoved(address UserAddress);
-    event StatusChanged(string Status);
+    constructor (string memory enterOrganizationName) public {
+        owner.ownerAddress = msg.sender;
+        owner.organizationName = enterOrganizationName;
+        owner.dateCreated = block.timestamp;
+        indexUser = 0;
+        indexEndorsee = 0;
+        status = true;
+  //      addUser(0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2, "a", "b");
+  //      addUser(0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db, "d", "c");
+    }
+
+    struct Owner {
+        address ownerAddress;
+        string organizationName;
+        uint dateCreated;
+    }
 
     struct User {
-        address user;
-        string role;
-        string notes;
+        string userRole;
+        string userNotes;
         uint userSince;
+        uint userIndex;
     }
 
     struct Endorse {
         address endorser;
-        address endorsee;
         string notes;
         uint endorseeSince;
+        uint endorseeIndex;
     }
 
     modifier onlyOwner {
-        require(msg.sender == owner);
+        require(msg.sender == owner.ownerAddress, "Only the owner of smart contract can add users");
         _;
     }
 
     modifier onlyUsers {
-        require((userId[msg.sender] != 0) || msg.sender == owner);
+        require(users[msg.sender].userSince != 0, "Only registered users can add/remove endorsees");
         _;
     }
 
-    constructor (string memory enterOrganizationName) public {
-        owner = msg.sender;
-        status = true;
-        numberOfUsers = 0;
-        addUser(owner, 'Creator and Owner of Smart Contract', 'Only one who can add users');
-        organizationName = enterOrganizationName;
-        numberOfEndorsees = 0;
-        addEndorsee(owner, "Creator and Owner of Smart Contract");
+    modifier contractActive {
+        require(status == true, "Smart contract is not active");
+        _;
     }
 
-    function addUser(address userAddress, string memory userRole, string memory userNotes) onlyOwner public {
-        require(status = true);
-        uint id = userId[userAddress];
-        if (id == 0) {
-            userId[userAddress] = numberOfUsers;
-            id = numberOfUsers;
-            users[id] = User({user: userAddress, userSince: block.timestamp, role: userRole, notes: userNotes});
-            emit UserAdded(userAddress, userRole, userNotes);
-            numberOfUsers++;
-        }
-        else {
-            users[id] = User({user: userAddress, userSince: block.timestamp, role: userRole, notes: userNotes});
-            emit UserUpdated(userAddress, userRole, userNotes);
-        }
+    //0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2
+    //0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db
+    function addUser(address _userAddress, string memory _userRole, string memory _userNotes) onlyOwner contractActive public {
+
+        //  option 1
+        //  User storage user = users[_userAddress];
+        //  user.userAddress = _userAddress;
+        //  user.userRole = _userRole;
+        //  user.userNotes = _userNotes;
+        //  user.userSince = block.timestamp;
+
+        //  short way
+        //  users[_userAddress] = User(__userRoleage, _userNotes, block.timestamp);
+
+        //readable way
+        require(users[_userAddress].userSince == 0, "User already exists");
+        users[_userAddress] = User(
+            {
+                userRole: _userRole,
+                userNotes: _userNotes,
+                userSince: block.timestamp,
+                userIndex: indexUser
+            });
+            userAccounts.push(_userAddress) -1;
+            indexUser++;
     }
 
-    function addEndorsee(address endorseeAddress, string memory endorseNotes) onlyUsers public {
-        require(status = true);
-        uint eid = endorsedUserId[endorseeAddress];
-        if (eid == 0) {
-            endorsedUserId[endorseeAddress] = numberOfEndorsees;
-            eid = numberOfEndorsees;
-            endorsedUsers[eid] = Endorse({endorser: msg.sender, endorsee: endorseeAddress, notes: endorseNotes, endorseeSince: block.timestamp});
-            emit UserEndorsed(msg.sender, endorseeAddress);
-            numberOfEndorsees++;
-        }
-        else
-        {
-            endorsedUsers[eid] = Endorse({endorser: msg.sender, endorsee: endorseeAddress, notes: endorseNotes, endorseeSince: block.timestamp});
-            emit UserEndorsed(msg.sender, endorseeAddress);
-        }
+    function removeUser(address _userAddress) onlyOwner contractActive public {
+        require(users[_userAddress].userSince != 0, "User does not exist");
+        delete userAccounts[users[_userAddress].userIndex]; //delete address from userAccounts
+        userAccounts[users[_userAddress].userIndex] = userAccounts[userAccounts.length - 1]; //copy last item to the just deleted address
+        User storage user = users[userAccounts[users[_userAddress].userIndex]]; //
+        user.userIndex = users[_userAddress].userIndex; //update the userIndex of the corresponding User struct of moved item
+        userAccounts.pop(); //remove the last item (same as the moved one)
+        delete users[_userAddress]; //delete user from mapping
+        indexUser--;
     }
 
-    function removeUser(address userAddress) onlyOwner public {
-        require(status = true);
-        require(userId[userAddress] != 0);
-        address ad;
-        for (uint i = userId[userAddress]; i<numberOfUsers-1; i++){
-            users[i] = users[i+1];
-            ad = users[i].user;
-            userId[ad] = i;
-        }
-        delete users[numberOfUsers-1];
-        emit UserRemoved(userAddress);
-        numberOfUsers--;
-        userId[userAddress] = 0;
+    //0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB
+    // 0x617F2E2fD72FD9D5503197092aC168c91465E7f2
+    function addEndorsee(address _endorseeAddress, string memory _endorseeNotes) onlyUsers contractActive public {
+        require(endorsees[_endorseeAddress].endorseeSince == 0, "Endorsee already exists");
+        endorsees[_endorseeAddress] = Endorse(
+            {
+                endorser: msg.sender,
+                notes: _endorseeNotes,
+                endorseeSince: block.timestamp,
+                endorseeIndex: indexEndorsee
+            });
+            endorseeAccounts.push(_endorseeAddress) -1;
+            indexEndorsee++;
     }
 
-    function removeEndorsee(address endorseeAddress) onlyUsers public {
-        require(status = true);
-        require(endorsedUserId[endorseeAddress] != 0);
-        Endorse storage p = endorsedUsers[endorsedUserId[endorseeAddress]];
-        require(p.endorser==msg.sender);
-        address ead;
-        for (uint i = endorsedUserId[endorseeAddress]; i<numberOfEndorsees-1; i++){
-            endorsedUsers[i] = endorsedUsers[i+1];
-            ead = endorsedUsers[i].endorsee;
-            endorsedUserId[ead] = i;
-        }
-        delete endorsedUsers[numberOfEndorsees-1];
-        emit EndorseeRemoved(endorseeAddress);
-        numberOfEndorsees--;
-        endorsedUserId[endorseeAddress] = 0;
+    function removeEndorsee(address _endorseeAddress) onlyUsers contractActive public {
+        require(endorsees[_endorseeAddress].endorseeSince != 0, "Endorsee does not exist");
+        require(endorsees[_endorseeAddress].endorser == msg.sender, "Only the endorser can remove an endorsee");
+        delete endorseeAccounts[endorsees[_endorseeAddress].endorseeIndex]; //delete address from userAccounts
+        endorseeAccounts[endorsees[_endorseeAddress].endorseeIndex] = endorseeAccounts[endorseeAccounts.length - 1]; //copy last item to the just deleted address
+        Endorse storage endorsee = endorsees[endorseeAccounts[endorsees[_endorseeAddress].endorseeIndex]]; //
+        endorsee.endorseeIndex = endorsees[_endorseeAddress].endorseeIndex; //update the userIndex of the corresponding User struct of moved item
+        endorseeAccounts.pop(); //remove the last item (same as the moved one)
+        delete endorsees[_endorseeAddress]; //delete user from mapping
+        indexEndorsee--;
     }
 
-    function changeStatus (bool deactivate) onlyOwner public {
-        if (deactivate)
-        {status = false;}
-        emit StatusChanged("Smart Contract Deactivated");
+    function changeStatus(bool _status) onlyOwner public {
+       status = _status;
+    }
+    function getOwner() public view returns (address ownerAddress, string memory organizationName, uint dateCreated){
+        return(owner.ownerAddress, owner.organizationName, owner.dateCreated);
     }
 
-    function getNumberOfUsers() public view returns (uint256) {
-        return numberOfUsers - 1;
+    function getUsers() public view returns (address[] memory){
+        return userAccounts;
     }
 
-    function getNumberOfEndorsees() public view returns (uint256) {
-        return numberOfEndorsees - 1;
+    function getEndorsees() public view returns (address[] memory){
+        return endorseeAccounts;
     }
+
+    function getNoOfUsers() public view returns (uint){
+        return userAccounts.length;
+    }
+
+    function getNoOfEndorsees() public view returns (uint){
+        return endorseeAccounts.length;
+    }
+
+    //same as built-in getter
+    // function getUser(address _address) public view returns (string memory userRole, string memory userNotes, uint userSince, uint index){
+    //      return(users[_address].userRole, users[_address].userNotes, users[_address].userSince, users[_address].userIndex);
+    // }
 }

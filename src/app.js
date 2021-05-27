@@ -75,116 +75,121 @@ App = {
 
   renderOrganizationName: async () => {
     // Load details of organization name and owner from the blockchain
-    const organizationName = await App.rbacSC.organizationName()
-    $("#orgName").text(organizationName);
-    var ownerDetails = await App.rbacSC.users(0)
+    //const organizationName = await App.rbacSC.organizationName()
+    const ownerDetails = await App.rbacSC.getOwner();
     var result = ownerDetails.toString().split(",");
+//    const organizationName = getOwner.toString().split(",");
+    $("#orgName").text(result[1]);
+    // var ownerDetails = await App.rbacSC.users(0)
+    // var result = ownerDetails.toString().split(",");
     $("#ownerAddress").text(result[0]);
-    $("#ownerRole").text(result [1]);
-    $("#ownerNotes").text(result [2]);
-    var ownerDate = new Date(result[3]*1000);
+    // $("#ownerRole").text(result [1]);
+    // $("#ownerNotes").text(result [2]);
+    var ownerDate = new Date(result[2]*1000);
     $("#ownerSince").text(ownerDate.toLocaleString());
-    var getNumOfUsers = await App.rbacSC.getNumberOfUsers()
-    var getNumOfEndorsees = await App.rbacSC.getNumberOfEndorsees()
+    var getNumOfUsers = await App.rbacSC.getNoOfUsers()
+    var getNumOfEndorsees = await App.rbacSC.getNoOfEndorsees()
     $("#numberOfUsers").text(getNumOfUsers);
     $("#numberOfEndorsees").text(getNumOfEndorsees);
     },
 
     addUser: async () => {
-        var funcUserAddress = $("#funcUserAddress").val();
-        var funcUserRole = $("#funcUserRole").val();
-        var funcUserNotes = $("#funcUserNotes").val();
-        await App.rbacSC.addUser(funcUserAddress, funcUserRole, funcUserNotes);
-        window.location.reload()
+         var funcUserAddress = $("#funcUserAddress").val();
+         var funcUserRole = $("#funcUserRole").val();
+         var funcUserNotes = $("#funcUserNotes").val();
+         await App.rbacSC.addUser(funcUserAddress, funcUserRole, funcUserNotes);
+         window.location.reload()
     },
 
     removeUser: async () => {
-        var remUserAddress = $("#remUserAddress").val();
-        await App.rbacSC.removeUser(remUserAddress);
-        window.location.reload()
+        // var remUserAddress = $("#remUserAddress").val();
+        // await App.rbacSC.removeUser(remUserAddress);
+        // window.location.reload()
     },
 
     addEndorsee: async () => {
-        var funcEndorseeAddress = $("#funcEndorseeAddress").val();
-        var funcEndorseeNotes = $("#funcEndorseeNotes").val();
-        await App.rbacSC.addEndorsee(funcEndorseeAddress, funcEndorseeNotes);
-        window.location.reload()
+        // var funcEndorseeAddress = $("#funcEndorseeAddress").val();
+        // var funcEndorseeNotes = $("#funcEndorseeNotes").val();
+        // await App.rbacSC.addEndorsee(funcEndorseeAddress, funcEndorseeNotes);
+        // window.location.reload()
     },
 
     removeEndorsee: async () => {
-        var remEndorseeAddress = $("#remEndorseeAddress").val();
-        await App.rbacSC.removeEndorsee(remEndorseeAddress);
-        window.location.reload()
+        // var remEndorseeAddress = $("#remEndorseeAddress").val();
+        // await App.rbacSC.removeEndorsee(remEndorseeAddress);
+        // window.location.reload()
     },
 
     displayUser: async () => {
-        var userCounterBox = parseInt($("#userCounter").val());
-        var userDetails = await App.rbacSC.users(userCounterBox)
-        var result = userDetails.toString().split(",");
-        $("#userAddress").text(result[0]);
-        $("#userRole").text(result [1]);
-        $("#userNotes").text(result [2]);
-        var myDate = new Date(result[3]*1000);
-        $("#userSince").text(myDate.toLocaleString());
+
+         var userCounterBox = parseInt($("#userCounter").val());
+         var userAddress = await App.rbacSC.userAccounts(userCounterBox);
+         var userDetails = await App.rbacSC.users(userAddress)
+         var result = userDetails.toString().split(",");
+         $("#userAddress").text(userAddress);
+         $("#userRole").text(result[0]);
+         $("#userNotes").text(result[1]);
+         var myDate = new Date(result[2]*1000);
+         $("#userSince").text(myDate.toLocaleString());
     },
 
     displayUserPlus: async () => {
-        var userCounterBox = parseInt($("#userCounter").val()) + 1;
-        var userDetails = await App.rbacSC.users(userCounterBox)
-        var result = userDetails.toString().split(",");
-        $("#userAddress").text(result[0]);
-        $("#userRole").text(result [1]);
-        $("#userNotes").text(result [2]);
-        var myDate = new Date(result[3]*1000);
-        $("#userSince").text(myDate.toLocaleString());
-        document.getElementById('userCounter').value =  userCounterBox;
+        // var userCounterBox = parseInt($("#userCounter").val()) + 1;
+        // var userDetails = await App.rbacSC.users(userCounterBox)
+        // var result = userDetails.toString().split(",");
+        // $("#userAddress").text(result[0]);
+        // $("#userRole").text(result [1]);
+        // $("#userNotes").text(result [2]);
+        // var myDate = new Date(result[3]*1000);
+        // $("#userSince").text(myDate.toLocaleString());
+        // document.getElementById('userCounter').value =  userCounterBox;
     },
 
     displayUserMinus: async () => {
-        var userCounterBox = parseInt($("#userCounter").val()) - 1;
-        var userDetails = await App.rbacSC.users(userCounterBox)
-        var result = userDetails.toString().split(",");
-        $("#userAddress").text(result[0]);
-        $("#userRole").text(result [1]);
-        $("#userNotes").text(result [2]);
-        var myDate = new Date(result[3]*1000);
-        $("#userSince").text(myDate.toLocaleString());
-        document.getElementById('userCounter').value =  userCounterBox;
+        // var userCounterBox = parseInt($("#userCounter").val()) - 1;
+        // var userDetails = await App.rbacSC.users(userCounterBox)
+        // var result = userDetails.toString().split(",");
+        // $("#userAddress").text(result[0]);
+        // $("#userRole").text(result [1]);
+        // $("#userNotes").text(result [2]);
+        // var myDate = new Date(result[3]*1000);
+        // $("#userSince").text(myDate.toLocaleString());
+        // document.getElementById('userCounter').value =  userCounterBox;
     },
 
     displayEndorsee: async () => {
-        var uendorseeCounterBox = parseInt($("#endorseeCounter").val());
-        var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
-        var result = endorseeDetails.toString().split(",");
-        $("#endorseeAddress").text(result[1]);
-        $("#endorserAddress").text(result[0]);
-        $("#endorseeNotes").text(result[2]);
-        var myDate = new Date(result[3]*1000);
-        $("#endorseeSince").text(myDate.toLocaleString());
+        // var uendorseeCounterBox = parseInt($("#endorseeCounter").val());
+        // var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
+        // var result = endorseeDetails.toString().split(",");
+        // $("#endorseeAddress").text(result[1]);
+        // $("#endorserAddress").text(result[0]);
+        // $("#endorseeNotes").text(result[2]);
+        // var myDate = new Date(result[3]*1000);
+        // $("#endorseeSince").text(myDate.toLocaleString());
     },
 
     displayEndorseePlus: async () => {
-        var uendorseeCounterBox = parseInt($("#endorseeCounter").val()) + 1;
-        var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
-        var result = endorseeDetails.toString().split(",");
-        $("#endorseeAddress").text(result[1]);
-        $("#endorserAddress").text(result[0]);
-        $("#endorseeNotes").text(result[2]);
-        var myDate = new Date(result[3]*1000);
-        $("#endorseeSince").text(myDate.toLocaleString());
-        document.getElementById('endorseeCounter').value =  uendorseeCounterBox;
+        // var uendorseeCounterBox = parseInt($("#endorseeCounter").val()) + 1;
+        // var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
+        // var result = endorseeDetails.toString().split(",");
+        // $("#endorseeAddress").text(result[1]);
+        // $("#endorserAddress").text(result[0]);
+        // $("#endorseeNotes").text(result[2]);
+        // var myDate = new Date(result[3]*1000);
+        // $("#endorseeSince").text(myDate.toLocaleString());
+        // document.getElementById('endorseeCounter').value =  uendorseeCounterBox;
     },
 
     displayEndorseeMinus: async () => {
-        var uendorseeCounterBox = parseInt($("#endorseeCounter").val()) - 1;
-        var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
-        var result = endorseeDetails.toString().split(",");
-        $("#endorseeAddress").text(result[1]);
-        $("#endorserAddress").text(result[0]);
-        $("#endorseeNotes").text(result[2]);
-        var myDate = new Date(result[3]*1000);
-        $("#endorseeSince").text(myDate.toLocaleString());
-        document.getElementById('endorseeCounter').value =  uendorseeCounterBox;
+        // var uendorseeCounterBox = parseInt($("#endorseeCounter").val()) - 1;
+        // var endorseeDetails = await App.rbacSC.endorsedUsers(uendorseeCounterBox)
+        // var result = endorseeDetails.toString().split(",");
+        // $("#endorseeAddress").text(result[1]);
+        // $("#endorserAddress").text(result[0]);
+        // $("#endorseeNotes").text(result[2]);
+        // var myDate = new Date(result[3]*1000);
+        // $("#endorseeSince").text(myDate.toLocaleString());
+        // document.getElementById('endorseeCounter').value =  uendorseeCounterBox;
     },
   }
 
