@@ -74,38 +74,47 @@ App = {
   },
 
   renderOrganizationName: async () => {
-    // Load details of organization name and owner from the blockchain
-    //const organizationName = await App.rbacSC.organizationName()
+
+    // Load details of organization name and owner
     const ownerDetails = await App.rbacSC.getOwner();
     var result = ownerDetails.toString().split(",");
-//    const organizationName = getOwner.toString().split(",");
-    $("#orgName").text(result[1]);
-    // var ownerDetails = await App.rbacSC.users(0)
-    // var result = ownerDetails.toString().split(",");
     $("#ownerAddress").text(result[0]);
-    // $("#ownerRole").text(result [1]);
-    // $("#ownerNotes").text(result [2]);
+    $("#orgName").text(result[1]);
     var ownerDate = new Date(result[2]*1000);
     $("#ownerSince").text(ownerDate.toLocaleString());
+
+    //Load details of users and endorsees
     var getNumOfUsers = await App.rbacSC.getNoOfUsers()
     var getNumOfEndorsees = await App.rbacSC.getNoOfEndorsees()
     $("#numberOfUsers").text(getNumOfUsers);
     $("#numberOfEndorsees").text(getNumOfEndorsees);
     },
 
-//add confirm and reject errors.
+    //add confirm and reject errors.
     addUser: async () => {
     try {
          var funcUserAddress = $("#funcUserAddress").val();
          var funcUserRole = $("#funcUserRole").val();
          var funcUserNotes = $("#funcUserNotes").val();
+         if (funcUserAddress != ""){
          await App.rbacSC.addUser(funcUserAddress, funcUserRole, funcUserNotes);
-         window.location.reload()}
+         window.alert("User added successfully");
+         window.location.reload()
+         }
+         else {
+           window.alert("Please fill in all fields");
+         }
+       }
     catch (error) {
             if (error.code === 4001) {
               window.alert("MetaMask Tx Signature: User denied transaction signature.")
-            } else if (error.code === -32603){
-              window.alert("Changes not saved, only the owner of smart contract can add users.")
+            }
+            if (error.code === -32603){
+              window.alert(error.message);
+             // window.alert("Changes not saved, only the owner of smart contract can add users.")
+            }
+            if (error.code === -32000){
+              window.alert(error.message);
             }
     }
     },
@@ -113,9 +122,14 @@ App = {
     removeUser: async () => {
         try {
          var remUserAddress = $("#remUserAddress").val();
+         if (remUserAddress != ""){
          await App.rbacSC.removeUser(remUserAddress);
-         window.location.reload()
          window.alert("User removed successfully.")
+         window.location.reload()
+         }
+         else {
+           window.alert("Please fill in address");
+         }
        }
          catch (error) {
                  if (error.code === 4001) {
@@ -131,7 +145,8 @@ App = {
           var funcEndorseeAddress = $("#funcEndorseeAddress").val();
           var funcEndorseeNotes = $("#funcEndorseeNotes").val();
           await App.rbacSC.addEndorsee(funcEndorseeAddress, funcEndorseeNotes);
-          window.location.reload()}
+          window.location.reload()
+        }
         catch (error) {
                 if (error.code === 4001) {
                   window.alert("MetaMask Tx Signature: User denied transaction signature.")
@@ -147,7 +162,7 @@ App = {
         await App.rbacSC.removeEndorsee(remEndorseeAddress);
         window.location.reload()
         window.alert("Endorsee removed successfully.")
-      }
+        }
         catch (error) {
                 if (error.code === 4001) {
                   window.alert("MetaMask Tx Signature: User denied transaction signature.")
@@ -161,7 +176,7 @@ App = {
       try {
          var userCounterBox = parseInt($("#userCounter").val());
          var userAddress = await App.rbacSC.userAccounts(userCounterBox);
-         var userDetails = await App.rbacSC.users(userAddress)
+         var userDetails = await App.rbacSC.usersAll(userAddress)
          var result = userDetails.toString().split(",");
          $("#userAddress").text(userAddress);
          $("#userRole").text(result[0]);
@@ -181,7 +196,7 @@ App = {
       try {
         var userCounterBox = parseInt($("#userCounter").val()) + 1;
         var userAddress = await App.rbacSC.userAccounts(userCounterBox);
-        var userDetails = await App.rbacSC.users(userAddress)
+        var userDetails = await App.rbacSC.usersAll(userAddress)
         var result = userDetails.toString().split(",");
         $("#userAddress").text(userAddress);
         $("#userRole").text(result[0]);
@@ -198,7 +213,7 @@ App = {
       try {
         var userCounterBox = parseInt($("#userCounter").val()) - 1;
         var userAddress = await App.rbacSC.userAccounts(userCounterBox);
-        var userDetails = await App.rbacSC.users(userAddress)
+        var userDetails = await App.rbacSC.usersAll(userAddress)
         var result = userDetails.toString().split(",");
         $("#userAddress").text(userAddress);
         $("#userRole").text(result[0]);
@@ -215,7 +230,7 @@ App = {
         try {
            var endorseeCounterBox = parseInt($("#endorseeCounter").val());
            var endorseeAddress = await App.rbacSC.endorseeAccounts(endorseeCounterBox)
-           var endorseeDetails = await App.rbacSC.endorsees(endorseeAddress)
+           var endorseeDetails = await App.rbacSC.endorseesAll(endorseeAddress)
            var result = endorseeDetails.toString().split(",");
            $("#endorseeAddress").text(endorseeAddress);
            $("#endorserAddress").text(result[0]);
@@ -234,7 +249,7 @@ App = {
         try {
           var endorseeCounterBox = parseInt($("#endorseeCounter").val()) + 1;
           var endorseeAddress = await App.rbacSC.endorseeAccounts(endorseeCounterBox)
-          var endorseeDetails = await App.rbacSC.endorsees(endorseeAddress)
+          var endorseeDetails = await App.rbacSC.endorseesAll(endorseeAddress)
           var result = endorseeDetails.toString().split(",");
           $("#endorseeAddress").text(endorseeAddress);
           $("#endorserAddress").text(result[0]);
@@ -251,7 +266,7 @@ App = {
       try {
         var endorseeCounterBox = parseInt($("#endorseeCounter").val()) - 1;
         var endorseeAddress = await App.rbacSC.endorseeAccounts(endorseeCounterBox)
-        var endorseeDetails = await App.rbacSC.endorsees(endorseeAddress)
+        var endorseeDetails = await App.rbacSC.endorseesAll(endorseeAddress)
         var result = endorseeDetails.toString().split(",");
         $("#endorseeAddress").text(endorseeAddress);
         $("#endorserAddress").text(result[0]);
