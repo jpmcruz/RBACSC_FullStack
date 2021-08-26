@@ -10,7 +10,7 @@ contract RBACSC is Ownable, AccessControl {
     address[] public userAccounts;
     mapping (address => EndorseStruct) public endorseesAll;
     address[] public endorseeAccounts;
-    OwnerStruct ownerdetails;
+    OwnerStruct public ownerdetails;
     uint public indexUser;
     uint public indexEndorsee;
     bool public status;
@@ -90,7 +90,7 @@ contract RBACSC is Ownable, AccessControl {
         grantRole(USER_ROLE, _userAddress);
     }
 
-    function removeUser(address _userAddress) onlyOwner contractActive public {
+    function removeUser(address _userAddress) public onlyOwner contractActive {
         require(usersAll[_userAddress].userSince != 0, "User does not exist");
         delete userAccounts[usersAll[_userAddress].userIndex]; //delete address from userAccounts
         userAccounts[usersAll[_userAddress].userIndex] = userAccounts[userAccounts.length - 1]; //copy last item to the just deleted address
@@ -102,7 +102,7 @@ contract RBACSC is Ownable, AccessControl {
         revokeRole(USER_ROLE, _userAddress);
     }
 
-    function addEndorsee(address _endorseeAddress, string memory _endorseeNotes) contractActive public onlyRole(USER_ROLE) {
+    function addEndorsee(address _endorseeAddress, string memory _endorseeNotes) public contractActive onlyRole(USER_ROLE) {
       //  require(hasRole(USER_ROLE, msg.sender), "Caller does not have the USER role");
         require(endorseesAll[_endorseeAddress].endorseeSince == 0, "Endorsee already exists");
         endorseesAll[_endorseeAddress] = EndorseStruct(
@@ -116,7 +116,7 @@ contract RBACSC is Ownable, AccessControl {
             indexEndorsee++;
     }
 
-    function removeEndorsee(address _endorseeAddress) contractActive public {
+    function removeEndorsee(address _endorseeAddress) public contractActive {
         require(endorseesAll[_endorseeAddress].endorseeSince != 0, "Endorsee does not exist");
         require(endorseesAll[_endorseeAddress].endorser == msg.sender, "Only the endorser can remove an endorsee");
         delete endorseeAccounts[endorseesAll[_endorseeAddress].endorseeIndex]; //delete address from userAccounts
@@ -128,7 +128,7 @@ contract RBACSC is Ownable, AccessControl {
         indexEndorsee--;
     }
 
-    function changeStatus(bool _status) onlyOwner public {
+    function changeStatus(bool _status) public onlyOwner {
        status = _status;
     }
     function getOwner() public view returns (address ownerAddress, string memory organizationName, uint dateCreated){
